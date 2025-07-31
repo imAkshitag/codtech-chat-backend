@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat | CodTech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #6c63ff;
+            --secondary-color: #f0f2f5;
+            --text-color: #333;
+            --message-bg: #fff;
+            --user-message-bg: #dcf8c6;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--secondary-color);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+        .chat-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+        #room-input-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        #room {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+        }
+        #joinBtn {
+            padding: 10px;
+            border: none;
+            background-color: var(--primary-color);
+            color: #fff;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+        }
+        .chat-main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background-color: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        #logoutBtn {
+            padding: 8px 15px;
+            border: none;
+            background-color: var(--primary-color);
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #chat {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+        .message .content {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 10px;
+            background-color: var(--message-bg);
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        .message.user .content {
+            background-color: var(--user-message-bg);
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message b {
+            color: var(--primary-color);
+        }
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+        }
+        #messageInput {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+        }
+        #sendBtn {
+            padding: 10px 20px;
+            border: none;
+            background-color: var(--primary-color);
+            color: #fff;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="sidebar">
+            <h2>Rooms</h2>
+            <div id="room-input-container">
+                <input type="text" id="room" placeholder="Enter Room Name" />
+                <button id="joinBtn" onclick="joinRoom()">Join</button>
+            </div>
+        </div>
+        <div class="chat-main">
+            <div class="chat-header">
+                <h2 id="room-name">CodTech Chat</h2>
+                <button id="logoutBtn" onclick="logout()">Logout</button>
+            </div>
+            <div id="chat"></div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Type your message" />
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      const username = localStorage.getItem('username');
+      if (!username) window.location.href = '/login.html';
+
+      const socket = io('http://localhost:5000');
+      let currentRoom = '';
+
+      function joinRoom() {
+        const room = document.getElementById('room').value;
+        if (!room) {
+          alert('Please enter a room name');
+          return;
+        }
+
+        currentRoom = room;
+        socket.emit('joinRoom', { username, room });
+
+        document.getElementById('room-name').innerText = room;
+        document.getElementById('chat').innerHTML = '';
+      }
+
+      socket.on('message', ({ username: msgUser, content }) => {
+        const chat = document.getElementById('chat');
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message');
+        if (msgUser === username) {
+            msgDiv.classList.add('user');
+        }
+
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('content');
+        contentDiv.innerHTML = `<b>${msgUser}:</b> ${content}`;
+        msgDiv.appendChild(contentDiv);
+
+        chat.appendChild(msgDiv);
+        chat.scrollTop = chat.scrollHeight;
+      });
+
+      function sendMessage() {
+        const content = document.getElementById('messageInput').value;
+        if (!content || !currentRoom) return;
+
+        socket.emit('chatMessage', { room: currentRoom, username, content });
+        document.getElementById('messageInput').value = '';
+      }
+      
+      function logout() {
+          localStorage.removeItem('username');
+          window.location.href = '/login.html';
+      }
+
+      document.getElementById('messageInput').addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+              sendMessage();
+          }
+      });
+    </script>
+</body>
+</html>
