@@ -6,6 +6,10 @@
 
 This is a real-time chat application built with Node.js, Express, Socket.IO, and MongoDB. It features a modern, colorful, and responsive user interface.
 
+## Live Demo
+
+You can access a live demo of the application here: [https://codtech-chat-backend.onrender.com/login.html](https://codtech-chat-backend.onrender.com/login.html)
+
 ## Features
 
 *   **User Authentication:** Secure user registration and login.
