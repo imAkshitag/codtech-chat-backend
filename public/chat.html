@@ -34,7 +34,7 @@
       const username = localStorage.getItem('username');
       if (!username) window.location.href = '/login.html';
 
-      const socket = io('http://localhost:5000');
+      const socket = io();
       let currentRoom = '';
 
       function joinRoom() {
