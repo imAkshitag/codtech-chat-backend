@@ -1,5 +1,9 @@
 # CodTech Chat Application
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![node-current](https://img.shields.io/node/v/npm)
+![npm-version](https://img.shields.io/npm/v/npm)
+
 This is a real-time chat application built with Node.js, Express, Socket.IO, and MongoDB. It features a modern, colorful, and responsive user interface.
 
 ## Features
@@ -54,3 +58,7 @@ To get the application up and running on your local machine, follow these steps:
 2.  After registering, go to `http://localhost:5000/login.html` to log in.
 3.  Once logged in, you will be redirected to the main chat page.
 4.  Enter a room name and click "Join" to start chatting.
+
+## Deployment
+
+This application can be easily deployed to platforms like Heroku, AWS, or any other service that supports Node.js applications.
